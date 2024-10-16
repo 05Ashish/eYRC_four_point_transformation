@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import sys
+import argparse
 
 def detect_aruco_markers(image):
     aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
@@ -39,7 +39,9 @@ def four_point_transform(image, pts):
 def detect_obstacles(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    thresh = cv2.threshold(blurred, 60, 255, cv2.THRESH_BINARY_INV)[1]    
+    thresh = cv2.threshold(blurred, 60, 255, cv2.THRESH_BINARY_INV)[1]
+    
+    # Use RETR_EXTERNAL to only get the outer contours
     contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     obstacles = []
@@ -66,22 +68,25 @@ def main(image_path):
         
         obstacles, total_area = detect_obstacles(warped)
         
-        # Generate text file output
+        # Draw green outlines
+        for obstacle in obstacles:
+            cv2.drawContours(warped, [obstacle], 0, (0, 255, 0), 2)
+        
+        cv2.imwrite("output_image.jpg", warped)
+        
         with open("obstacles.txt", "w") as f:
             f.write(f"ArUco ID: {[id[0] for id in ids]}\n")
             f.write(f"Obstacles: {len(obstacles)}\n")
             f.write(f"Area: {total_area:.1f}\n")
         
-        # Save the warped output image
-        cv2.imwrite("output_image.jpg", warped)
-
         print("Processing complete. Check output_image.jpg and obstacles.txt for results.")
     else:
         print(f"Could not detect all four ArUco markers. Detected {len(corners) if corners else 0} markers.")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Error: Please provide the image path as a command-line argument.")
-    else:
-        image_path = sys.argv[1]
-        main(image_path)
+    parser = argparse.ArgumentParser(description="Detect ArUco markers and obstacles in an image.")
+    parser.add_argument("--image", required=True, help="Path to the input image")
+    args = parser.parse_args()
+    
+    main(args.image)
+

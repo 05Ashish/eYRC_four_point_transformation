@@ -1,3 +1,14 @@
-ArUco ID: [np.int32(90), np.int32(95), np.int32(85), np.int32(80)]
-Obstacles: 2
-Area: 2641.0
+ArUco IDs: [90, 95, 85, 80]
+
+Detailed Obstacle Information:
+Number of obstacles: 1
+Total obstacle area: 2600.0 pixels
+Image dimensions: 748x726
+Total image area: 543048 pixels
+Relative total obstacle area: 0.48%
+
+
+Obstacle 1:
+  Contour Area: 2589.5 pixels
+  Rectangle Area: 2600.0 pixels
+  Relative Area: 0.48%
